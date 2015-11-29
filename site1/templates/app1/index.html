@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+
+    <head>
+        <title>App1</title>
+    </head>
+
+    <body>
+        <h1>App1 says...</h1>
+        hello world! <strong>{{ boldmessage }}</strong><br />
+        <a href="/app1/about/">About</a><br />
+        <img src="{% static "images/img1.jpg" %}" alt="On a good start!" />
+    </body>
+
+</html>

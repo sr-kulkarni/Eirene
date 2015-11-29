@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+
+    <head>
+        <title>App1</title>
+    </head>
+
+    <body>
+        <h1>Let me tell you a bit about us! </h1>
+        We are : <strong>{{ boldmessage }}</strong><br />
+        This is the about page. Do you wanna go back to the <a href='/app1/'>main page?</a><br />
+        <img src="{% static "images/aboutimg.jpg" %}" alt="Ahem Abou About!" />
+    </body>
+
+</html>

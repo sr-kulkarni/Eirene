@@ -8,7 +8,17 @@
 
     <body>
         <h1>App1 says...</h1>
-        hello world! <strong>{{ boldmessage }}</strong><br />
+        hello world! 
+        <br/>
+        {% if categories %}
+        <ul>
+        	{% for category in categories %}
+        	<li>{{ category.name }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <strong>There are no categories present,man! Add some NOW! </strong>
+        {% endif %}
         <a href="/app1/about/">About</a><br />
         <img src="{% static "images/img1.jpg" %}" alt="On a good start!" />
     </body>

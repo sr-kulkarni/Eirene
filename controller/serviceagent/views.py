@@ -3,21 +3,17 @@ from django.shortcuts import render
 # Create your views here.
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.renderers import JSONRenderer
-from rest_framework.parsers import JSONParser
+#from rest_framework.renderers import JSONRenderer
+#from rest_framework.parsers import JSONParser
+
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from serviceagent.models import Serviceagent,Service
 from serviceagent.serializers import ServiceagentSerializer, ServiceSerializer
 
-class JSONResponse(HttpResponse):
-    """
-    An HttpResponse that renders its content into JSON.
-    """
-    def __init__(self, data, **kwargs):
-        content = JSONRenderer().render(data)
-        kwargs['content_type'] = 'application/json'
-        super(JSONResponse, self).__init__(content, **kwargs)
 
-@csrf_exempt
+@api_view(['GET','POST'])
 def service_list(request):
     """
     List all code snippets, or create a new snippet.
@@ -25,17 +21,17 @@ def service_list(request):
     if request.method == 'GET':
         services = Service.objects.all()
         serializer = ServiceSerializer(services, many=True)
-        return JSONResponse(serializer.data)
+        return Response(serializer.data)
 
     elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = ServiceSerializer(data=data)
+        #data = JSONParser().parse(request)
+        serializer = ServiceSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return JSONResponse(serializer.data, status=201)
-        return JSONResponse(serializer.errors, status=400)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return JSONResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@csrf_exempt
+@api_view(['GET','PUT','DELETE'])
 def service_detail(request,pk):
     """
     Retrieve, update or delete a service
@@ -44,41 +40,41 @@ def service_detail(request,pk):
 	#print name
         service = Service.objects.get(pk=pk)
     except Service.DoesNotExist:
-        return HttpResponse(status=404)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
         serializer = ServiceSerializer(service)
-        return JSONResponse(serializer.data)
+        return Response(serializer.data)
 
     elif request.method == 'PUT':
-        data = JSONParser().parse(request)
-        serializer = ServiceSerializer(service, data=data)
+        #data = JSONParser().parse(request)
+        serializer = ServiceSerializer(service, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return JSONResponse(serializer.data)
-        return JSONResponse(serializer.errors, status=400)
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
         service.delete()
-        return HttpResponse(status=204)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@csrf_exempt
+@api_view(['GET','POST'])
 def agent_list(request):
     if request.method == 'GET':
         agents = Serviceagent.objects.all()
         serializer = ServiceagentSerializer(agents, many=True)
-        return JSONResponse(serializer.data)
+        return Response(serializer.data)
 
     elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = ServiceagentSerializer(data=data)
+        #data = JSONParser().parse(request)
+        serializer = ServiceagentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return JSONResponse(serializer.data, status=201)
-        return JSONResponse(serializer.errors, status=400)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@csrf_exempt
+@api_view(['GET','PUT','DELETE'])
 def agent_detail(request,pk):
     """
     Retrieve, update or delete a service
@@ -87,21 +83,21 @@ def agent_detail(request,pk):
         #print name
         agent = Serviceagent.objects.get(pk=pk)
     except Serviceagent.DoesNotExist:
-        return HttpResponse(status=404)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
         serializer = ServiceagentSerializer(agent)
-        return JSONResponse(serializer.data)
+        return Response(serializer.data)
 
     elif request.method == 'PUT':
-        data = JSONParser().parse(request)
-        serializer = ServiceagentSerializer(agent, data=data)
+        #data = JSONParser().parse(request)
+        serializer = ServiceagentSerializer(agent, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return JSONResponse(serializer.data)
-        return JSONResponse(serializer.errors, status=400)
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
         agent.delete()
-        return HttpResponse(status=204)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 

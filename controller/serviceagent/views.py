@@ -36,6 +36,34 @@ def service_list(request):
         return JSONResponse(serializer.errors, status=400)
 
 @csrf_exempt
+def service_detail(request,pk):
+    """
+    Retrieve, update or delete a service
+    """
+    try:
+	#print name
+        service = Service.objects.get(pk=pk)
+    except Service.DoesNotExist:
+        return HttpResponse(status=404)
+
+    if request.method == 'GET':
+        serializer = ServiceSerializer(service)
+        return JSONResponse(serializer.data)
+
+    elif request.method == 'PUT':
+        data = JSONParser().parse(request)
+        serializer = ServiceSerializer(service, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JSONResponse(serializer.data)
+        return JSONResponse(serializer.errors, status=400)
+
+    elif request.method == 'DELETE':
+        service.delete()
+        return HttpResponse(status=204)
+
+
+@csrf_exempt
 def agent_list(request):
     if request.method == 'GET':
         agents = Serviceagent.objects.all()
@@ -50,4 +78,30 @@ def agent_list(request):
             return JSONResponse(serializer.data, status=201)
         return JSONResponse(serializer.errors, status=400)
 
+@csrf_exempt
+def agent_detail(request,pk):
+    """
+    Retrieve, update or delete a service
+    """
+    try:
+        #print name
+        agent = Serviceagent.objects.get(pk=pk)
+    except Serviceagent.DoesNotExist:
+        return HttpResponse(status=404)
+
+    if request.method == 'GET':
+        serializer = ServiceagentSerializer(agent)
+        return JSONResponse(serializer.data)
+
+    elif request.method == 'PUT':
+        data = JSONParser().parse(request)
+        serializer = ServiceagentSerializer(agent, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JSONResponse(serializer.data)
+        return JSONResponse(serializer.errors, status=400)
+
+    elif request.method == 'DELETE':
+        agent.delete()
+        return HttpResponse(status=204)
 

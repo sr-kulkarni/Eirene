@@ -14,7 +14,7 @@ from serviceagent.serializers import ServiceagentSerializer, ServiceSerializer
 
 
 @api_view(['GET','POST'])
-def service_list(request):
+def service_list(request,format=None):
     """
     List all code snippets, or create a new snippet.
     """
@@ -32,7 +32,7 @@ def service_list(request):
         return JSONResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET','PUT','DELETE'])
-def service_detail(request,pk):
+def service_detail(request,pk,format=None):
     """
     Retrieve, update or delete a service
     """
@@ -60,7 +60,7 @@ def service_detail(request,pk):
 
 
 @api_view(['GET','POST'])
-def agent_list(request):
+def agent_list(request,format=None):
     if request.method == 'GET':
         agents = Serviceagent.objects.all()
         serializer = ServiceagentSerializer(agents, many=True)
@@ -75,7 +75,7 @@ def agent_list(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET','PUT','DELETE'])
-def agent_detail(request,pk):
+def agent_detail(request,pk,format=None):
     """
     Retrieve, update or delete a service
     """

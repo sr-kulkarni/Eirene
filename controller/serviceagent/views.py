@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from serviceagent.models import Serviceagent,Service
 from serviceagent.serializers import ServiceagentSerializer, ServiceSerializer
 
+import consul 
 
 @api_view(['GET','POST'])
 def service_list(request,format=None):
@@ -63,7 +64,14 @@ def service_detail(request,pk,format=None):
 def agent_list(request,format=None):
     if request.method == 'GET':
         agents = Serviceagent.objects.all()
-        serializer = ServiceagentSerializer(agents, many=True)
+        c = consul.Consul()
+        
+	services = c.agent.services()
+        #print services.keys()
+        #for keys in services.keys():
+	string = str(services.keys())
+        responseAgent = Serviceagent(agent=string)	 
+	serializer = ServiceagentSerializer(responseAgent)
         return Response(serializer.data)
 
     elif request.method == 'POST':

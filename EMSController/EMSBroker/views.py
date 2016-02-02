@@ -7,7 +7,7 @@ from django.shortcuts import render
 # Create your views here.
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-#from rest_framework.renderers import JSONRenderer
+from rest_framework.renderers import JSONRenderer
 #from rest_framework.parsers import JSONParser
 
 from rest_framework import status
@@ -30,11 +30,20 @@ def service_list(request,format=None):
 
     elif request.method == 'POST':
         #data = JSONParser().parse(request)
-        serializer = ServiceHelperSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return JSONResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serviceDict = {}
+	shDict = {}
+
+	name = request.data['name']
+	address = request.data['address']
+	serviceDict['name'] = name
+	serviceDict['address'] = address
+	s1 = Service(name=name, address=address)
+	s1Serializer = ServiceSerializer(data=serviceDict)
+        
+	if s1Serializer.is_valid():
+	    	 s1Serializer.save()
+		 return Response(s1Serializer.data, status=status.HTTP_201_CREATED)
+        return Response(s1Serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 #Some work required here
@@ -52,7 +61,7 @@ def service_detail(request,pk,format=None):
     if request.method == 'GET':
         serializer = ServiceSerializer(service)
         return Response(serializer.data)
-
+    #Some changes required Here. 
     elif request.method == 'PUT':
         #data = JSONParser().parse(request)
         serializer = ServiceHelperSerializer(service, data=request.data)

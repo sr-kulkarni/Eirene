@@ -18,32 +18,58 @@ from EMSBroker.serializers import ServiceHelperSerializer, ServiceSerializer
 
 import consul 
 
+
+
+def putService(servDict):
+	c = consul.Consul()
+	try:
+		for item in servDict.items():
+			c.agent.service.register(name=item[0],address=item[1])
+	except:
+		raise Exception("Some problem with Consul!")
+
+def getService():
+	c = consul.Consul()
+	sDict = {}
+	serviceList = c.agent.services()
+	for item in serviceList.items():
+		sDict[item[0]] = item[1]['Address']
+
+	return sDict	
+
+
+
+
+
+
 @api_view(['GET','POST'])
 def service_list(request,format=None):
     """
     List all code snippets, or create a new snippet.
     """
     if request.method == 'GET':
-        services = Service.objects.all()
-        serializer = ServiceSerializer(services, many=True)
+        #services = Service.objects.all()
+        sDict = getService()
+	services = []
+	for item in sDict.items():
+		#print item[0] + "address : " +item[1]
+		tempService = Service(name=item[0],address=item[1])
+		services.append(tempService)
+
+	serializer = ServiceSerializer(services, many=True)
         return Response(serializer.data)
 
     elif request.method == 'POST':
         #data = JSONParser().parse(request)
         serviceDict = {}
-	shDict = {}
-
-	name = request.data['name']
-	address = request.data['address']
-	serviceDict['name'] = name
-	serviceDict['address'] = address
-	s1 = Service(name=name, address=address)
-	s1Serializer = ServiceSerializer(data=serviceDict)
+	serviceDict[request.data['name']]=request.data['address']
         
-	if s1Serializer.is_valid():
-	    	 s1Serializer.save()
-		 return Response(s1Serializer.data, status=status.HTTP_201_CREATED)
-        return Response(s1Serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+	putService(serviceDict)
+	
+	#if s1Serializer.is_valid():
+	#    	 s1Serializer.save()
+        return Response(serviceDict, status=status.HTTP_201_CREATED)
+        #return Response(s1Serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 #Some work required here

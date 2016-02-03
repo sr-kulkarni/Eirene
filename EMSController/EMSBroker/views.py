@@ -15,27 +15,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from EMSBroker.models import ServiceHelper,Service
 from EMSBroker.serializers import ServiceHelperSerializer, ServiceSerializer
+from EMSBroker.plugins import ConsulPlugin
 
-import consul 
-
-
-
-def putService(servDict):
-	c = consul.Consul()
-	try:
-		for item in servDict.items():
-			c.agent.service.register(name=item[0],address=item[1])
-	except:
-		raise Exception("Some problem with Consul!")
-
-def getService():
-	c = consul.Consul()
-	sDict = {}
-	serviceList = c.agent.services()
-	for item in serviceList.items():
-		sDict[item[0]] = item[1]['Address']
-
-	return sDict	
 
 
 
@@ -48,28 +29,26 @@ def service_list(request,format=None):
     List all code snippets, or create a new snippet.
     """
     if request.method == 'GET':
-        #services = Service.objects.all()
-        sDict = getService()
-	services = []
-	for item in sDict.items():
-		#print item[0] + "address : " +item[1]
-		tempService = Service(name=item[0],address=item[1])
-		services.append(tempService)
-
-	serializer = ServiceSerializer(services, many=True)
-        return Response(serializer.data)
+        plugin = ConsulPlugin()
+	sDict = plugin.getService()
+	if any(sDict):
+		services = []
+		for item in sDict.items():
+			print item[0] + "address : " +item[1]
+			tempService = Service(name=item[0],address=item[1])
+			services.append(tempService)
+	
+		serializer = ServiceSerializer(services, many=True)
+        	return Response(serializer.data)
+	else: return Response(status=status.HTTP_404_NOT_FOUND)
 
     elif request.method == 'POST':
-        #data = JSONParser().parse(request)
         serviceDict = {}
 	serviceDict[request.data['name']]=request.data['address']
-        
-	putService(serviceDict)
-	
-	#if s1Serializer.is_valid():
-	#    	 s1Serializer.save()
-        return Response(serviceDict, status=status.HTTP_201_CREATED)
-        #return Response(s1Serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+	plugin = ConsulPlugin()        
+	plugin.putService(serviceDict)
+	return Response(serviceDict, status=status.HTTP_201_CREATED)
+       
 
 
 #Some work required here

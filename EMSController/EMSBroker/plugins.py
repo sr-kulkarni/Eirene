@@ -29,6 +29,27 @@ class ConsulPlugin:
 
         	return sDict
 
+	def getServiceDetails(self,name,params=None):
+		sDict = {}
+		if params==None :self.client = consul.Consul()
+                else: self.client = consul.Consul(params)
+	
+		serviceList = self.client.agent.services()
+                for item in serviceList.items():
+			#print item
+			if item[0]==name:
+				#print "Found!"
+				sDict[item[0]] = item[1]['Address']
+				return sDict
+		return sDict
+	
+	def deleteService(self,name,params=None):
+		if params==None :self.client = consul.Consul()
+                else: self.client = consul.Consul(params)
+		serviceList = self.client.agent.services()
+                for item in serviceList.items():
+                        if item[0]==name:
+				self.client.agent.service.deregister(item[1]['ID'])
 
 
 

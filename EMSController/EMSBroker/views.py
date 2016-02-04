@@ -34,7 +34,7 @@ def service_list(request,format=None):
 	if any(sDict):
 		services = []
 		for item in sDict.items():
-			print item[0] + "address : " +item[1]
+			#print item[0] + "address : " +item[1]
 			tempService = Service(name=item[0],address=item[1])
 			services.append(tempService)
 	
@@ -57,16 +57,20 @@ def service_detail(request,pk,format=None):
     """
     Retrieve, update or delete a service
     """
+    #print pk
+    
     try:
-	#print name
-        service = Service.objects.get(pk=pk)
-    except Service.DoesNotExist:
+	plugin = ConsulPlugin()
+        service = plugin.getServiceDetails(name=pk)
+	#print service
+    except:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
-        serializer = ServiceSerializer(service)
+        tempService = Service(name=pk,address=service[pk])
+	serializer = ServiceSerializer(tempService)
         return Response(serializer.data)
-    #Some changes required Here. 
+    #Some changes required Here. Update changes pending 
     elif request.method == 'PUT':
         #data = JSONParser().parse(request)
         serializer = ServiceHelperSerializer(service, data=request.data)
@@ -76,6 +80,6 @@ def service_detail(request,pk,format=None):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
-        service.delete()
+        plugin.deleteService(pk)
         return Response(status=status.HTTP_204_NO_CONTENT)
-
+   

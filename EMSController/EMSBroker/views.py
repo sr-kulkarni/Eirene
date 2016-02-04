@@ -49,13 +49,14 @@ def service_detail(request,pk,format=None):
         service = plugin.getServiceDetails(name=pk)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
+	
+    if any(service):
+    	if request.method == 'GET':
+        	tempService = Service(name=pk,address=service[pk])
+		serializer = ServiceSerializer(tempService)
+        	return Response(serializer.data)
 
-    if request.method == 'GET':
-        tempService = Service(name=pk,address=service[pk])
-	serializer = ServiceSerializer(tempService)
-        return Response(serializer.data)
-
-    elif request.method == 'DELETE':
-        plugin.deleteService(pk)
-        return Response(status=status.HTTP_204_NO_CONTENT)
-   
+    	elif request.method == 'DELETE':
+        	plugin.deleteService(pk)
+        	return Response(status=status.HTTP_204_NO_CONTENT)
+    else:return Response(status=status.HTTP_404_NOT_FOUND)

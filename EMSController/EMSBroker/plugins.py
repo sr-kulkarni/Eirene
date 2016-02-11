@@ -2,6 +2,9 @@ import consul
 
 class ConsulPlugin:
 	
+	#More Try/Except blocks needed here. 
+	#This is bare minimum functionality.Skeleton seems to be working ok
+	
 	def __init__(self,params=None):
 		print "Consul Initiated!"
 		self.client = consul.Consul(params)
@@ -25,20 +28,23 @@ class ConsulPlugin:
 
 		serviceList = self.client.agent.services()
 		for item in serviceList.items():
-			sDict[item[0]] = item[1]['Address']
+			if item[0] == "consul":pass
+			else:
+				sDict[item[0]] = item[1]['Address']
 
         	return sDict
 
 	def getServiceDetails(self,name,params=None):
 		sDict = {}
+
 		if params==None :self.client = consul.Consul()
                 else: self.client = consul.Consul(params)
+		if name=="consul":
+			return sDict		
 	
 		serviceList = self.client.agent.services()
                 for item in serviceList.items():
-			#print item
 			if item[0]==name:
-				#print "Found!"
 				sDict[item[0]] = item[1]['Address']
 				return sDict
 		return sDict
@@ -46,6 +52,7 @@ class ConsulPlugin:
 	def deleteService(self,name,params=None):
 		if params==None :self.client = consul.Consul()
                 else: self.client = consul.Consul(params)
+		if name=="consul":return
 		serviceList = self.client.agent.services()
                 for item in serviceList.items():
                         if item[0]==name:

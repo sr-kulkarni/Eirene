@@ -10,7 +10,7 @@ from EMSBroker.plugins import ConsulPlugin
 
 
 
-
+#onsulPlugin shouldbe defined in a conf file. No explicit imports
 
 
 @api_view(['GET','POST'])
@@ -38,7 +38,7 @@ def service_list(request,format=None):
 	plugin.putService(serviceDict)
 	return Response(serviceDict, status=status.HTTP_201_CREATED)
        
-
+#More plumbing required.
 @api_view(['GET','DELETE'])
 def service_detail(request,pk,format=None):
     """

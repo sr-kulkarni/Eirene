@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from EMSBroker.models import Service
 from EMSBroker.serializers import ServiceSerializer
 from EMSBroker.plugins import ConsulPlugin
-
-
+import os
+import ConfigParser
 
 
 #onsulPlugin shouldbe defined in a conf file. No explicit imports
@@ -19,7 +19,16 @@ def service_list(request,format=None):
     List all services, or create a new service.
     """
     if request.method == 'GET':
-        plugin = ConsulPlugin()
+        pluginFile = os.getcwd()
+	#print pluginFile	
+	pluginFile += '/config/plugins.conf'
+	#print pluginFile
+	config = ConfigParser.ConfigParser()
+	config.read(pluginFile)
+	print config.get('services','plugin')
+	
+	
+	plugin = ConsulPlugin()
 	sDict = plugin.getService()
 	if any(sDict):
 		services = []
